@@ -13,14 +13,27 @@ export default function LoginForm() {
     setStatus("loading");
     setError("");
 
+    // Check env vars are present
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+    if (!url || !key) {
+      setError(`Missing config: URL=${!!url} KEY=${!!key}`);
+      setStatus("error");
+      return;
+    }
+
     try {
+      const timeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Request timed out after 10s — check Supabase project status")), 10000)
+      );
+
       const supabase = createClient();
-      const { error } = await supabase.auth.signInWithOtp({
+      const authCall = supabase.auth.signInWithOtp({
         email,
-        options: {
-          emailRedirectTo: `${location.origin}/auth/callback`,
-        },
+        options: { emailRedirectTo: `${location.origin}/auth/callback` },
       });
+
+      const { error } = await Promise.race([authCall, timeout]);
 
       if (error) {
         setError(error.message);
@@ -29,7 +42,7 @@ export default function LoginForm() {
         setStatus("sent");
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Something went wrong. Please try again.";
+      const msg = err instanceof Error ? err.message : "Something went wrong.";
       setError(msg);
       setStatus("error");
     }
@@ -62,7 +75,11 @@ export default function LoginForm() {
         required
         className="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm mb-4"
       />
-      {error && <p className="text-rose-400 text-xs mb-3">{error}</p>}
+      {error && (
+        <p className="text-rose-400 text-xs mb-3 bg-rose-950/40 border border-rose-800 rounded p-2">
+          {error}
+        </p>
+      )}
       <button
         type="submit"
         disabled={status === "loading"}
