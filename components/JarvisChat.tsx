@@ -39,7 +39,7 @@ function MessageBubble({ msg }: { msg: Message }) {
   );
 }
 
-export default function JarvisChat() {
+export default function AtlasChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -116,7 +116,7 @@ export default function JarvisChat() {
             <span className="text-white font-bold text-sm">J</span>
           </div>
           <div>
-            <h1 className="text-white font-bold text-lg leading-none">Jarvis</h1>
+            <h1 className="text-white font-bold text-lg leading-none">Atlas</h1>
             <p className="text-slate-500 text-xs mt-0.5">Your AI BD Brain — powered by Claude</p>
           </div>
           <div className="ml-auto flex items-center gap-1.5">
@@ -183,7 +183,7 @@ export default function JarvisChat() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKey}
-            placeholder="Ask Jarvis anything about your pipeline, contacts, or properties..."
+            placeholder="Ask Atlas anything about your pipeline, contacts, or properties..."
             rows={1}
             className="flex-1 px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             style={{ minHeight: "44px", maxHeight: "120px" }}

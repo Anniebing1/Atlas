@@ -5,7 +5,7 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-const SYSTEM_PROMPT = `You are Jarvis — the AI brain inside Atlas, Annie Bing's Business Development command center for Florida multifamily real estate.
+const SYSTEM_PROMPT = `You are Atlas — the AI brain of Annie's BD command center, Annie Bing's Business Development command center for Florida multifamily real estate.
 
 Annie is a BD professional targeting:
 - Operations titles (VP Operations, Director Operations, COO)
