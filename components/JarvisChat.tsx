@@ -18,7 +18,7 @@ function MessageBubble({ msg }: { msg: Message }) {
     <div className={`flex gap-3 ${isUser ? "justify-end" : "justify-start"}`}>
       {!isUser && (
         <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0 mt-0.5">
-          <span className="text-white text-xs font-bold">J</span>
+          <span className="text-white text-xs font-bold">A</span>
         </div>
       )}
       <div
@@ -161,7 +161,7 @@ export default function AtlasChat() {
         {loading && messages[messages.length - 1]?.role === "assistant" && messages[messages.length - 1]?.content === "" && (
           <div className="flex gap-3">
             <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
-              <span className="text-white text-xs font-bold">J</span>
+              <span className="text-white text-xs font-bold">A</span>
             </div>
             <div className="bg-[#1e2a3a] border border-slate-700/50 rounded-2xl rounded-tl-sm px-4 py-3">
               <div className="flex gap-1">
