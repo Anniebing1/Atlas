@@ -47,10 +47,10 @@ export async function POST(req: Request) {
       supabase.from("deals").select("*", { count: "exact", head: true }),
     ]);
 
-    // Pull up to 200 company records so Atlas can actually answer data questions
+    // Pull structured property data
     const companiesRes = wantsProperties !== null
-      ? (await supabase.from("companies").select("name, notes").limit(200)).data ?? []
-      : (await supabase.from("companies").select("name, notes").limit(20)).data ?? [];
+      ? (await supabase.from("companies").select("name, city, state, market, units, building_class, year_built, owner_name, manager_name, for_sale, sale_price").limit(500)).data ?? []
+      : (await supabase.from("companies").select("name, city, market, building_class, year_built, for_sale").limit(20)).data ?? [];
 
     const contactsRes = (await supabase.from("contacts")
       .select("first_name, last_name, title, email, notes, company:companies(name)")
@@ -60,23 +60,35 @@ export async function POST(req: Request) {
       ? (await supabase.from("deals").select("title, value, stage, notes, company:companies(name)").limit(20)).data ?? []
       : [];
 
-    // Parse year built from notes for "built before X" questions
+    // Pre-aggregate stats from structured columns
     let yearStats = "";
     if (lastMessage.includes("built") || lastMessage.includes("year")) {
       const yearCounts: Record<string, number> = { "before 1980": 0, "1980-1999": 0, "2000-2009": 0, "2010-2019": 0, "2020+": 0, "unknown": 0 };
       for (const c of companiesRes) {
-        const match = (c.notes ?? "").match(/Year Built: (\d{4})/);
-        if (!match) { yearCounts["unknown"]++; continue; }
-        const y = parseInt(match[1]);
+        const y = (c as Record<string, unknown>).year_built as number | null;
+        if (!y) { yearCounts["unknown"]++; continue; }
         if (y < 1980) yearCounts["before 1980"]++;
         else if (y < 2000) yearCounts["1980-1999"]++;
         else if (y < 2010) yearCounts["2000-2009"]++;
         else if (y < 2020) yearCounts["2010-2019"]++;
         else yearCounts["2020+"]++;
       }
-      yearStats = `\nYEAR BUILT BREAKDOWN (from ${companiesRes.length} sampled properties):\n` +
+      yearStats = `\nYEAR BUILT BREAKDOWN (from ${companiesRes.length} properties):\n` +
         Object.entries(yearCounts).map(([k, v]) => `  ${k}: ${v}`).join("\n");
     }
+
+    // Market breakdown
+    const marketCounts: Record<string, number> = {};
+    for (const c of companiesRes) {
+      const m = ((c as Record<string, unknown>).market as string) ?? "Unknown";
+      marketCounts[m] = (marketCounts[m] ?? 0) + 1;
+    }
+    const marketStats = `\nMARKET BREAKDOWN:\n` +
+      Object.entries(marketCounts).sort((a, b) => b[1] - a[1]).slice(0, 15)
+        .map(([k, v]) => `  ${k}: ${v}`).join("\n");
+
+    // For sale count
+    const forSaleCount = companiesRes.filter((c) => (c as Record<string, unknown>).for_sale).length;
 
     const dbContext = `
 DATABASE SUMMARY:
@@ -85,9 +97,15 @@ DATABASE SUMMARY:
 - Total deals: ${dealCount}
 ${yearStats}
 
-PROPERTY SAMPLE (${companiesRes.length} records):
-${companiesRes.slice(0, 50).map((c: Record<string, unknown>) => `• ${c.name} — ${String(c.notes ?? "").substring(0, 180)}`).join("\n")}
-${companiesRes.length > 50 ? `\n...and ${companiesRes.length - 50} more properties loaded for analysis.` : ""}
+${yearStats}
+${marketStats}
+- Properties for sale: ${forSaleCount}
+
+PROPERTY SAMPLE (first 50 of ${companiesRes.length} loaded):
+${companiesRes.slice(0, 50).map((c: Record<string, unknown>) =>
+  `• ${c.name} | ${c.city ?? "??"}, ${c.state ?? "FL"} | Market: ${c.market ?? "?"} | Class: ${c.building_class ?? "?"} | Units: ${c.units ?? "?"} | Built: ${c.year_built ?? "?"} | Owner: ${c.owner_name ?? "?"} | For Sale: ${c.for_sale ? `Yes $${Number(c.sale_price ?? 0).toLocaleString()}` : "No"}`
+).join("\n")}
+${companiesRes.length > 50 ? `\n...and ${companiesRes.length - 50} more properties available for analysis.` : ""}
 
 CONTACTS (${contactsRes.length}):
 ${contactsRes.map((c: Record<string, unknown>) => {
