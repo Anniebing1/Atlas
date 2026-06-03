@@ -1,11 +1,18 @@
 // Fetches latest multifamily news from RSS feeds
 
 const FEEDS = [
+  // National multifamily
   { name: "Multi-Housing News", url: "https://www.multihousingnews.com/feed/" },
-  { name: "GlobeSt Multifamily", url: "https://www.globest.com/feed/multifamily/" },
   { name: "Multifamily Executive", url: "https://www.multifamilyexecutive.com/rss" },
+  { name: "GlobeSt Multifamily", url: "https://www.globest.com/feed/multifamily/" },
   { name: "NMHC", url: "https://www.nmhc.org/rss/" },
-  { name: "Connect CRE Florida", url: "https://florida.connect.media/feed/" },
+  { name: "National Apartment Association", url: "https://www.naahq.org/rss.xml" },
+  { name: "Apartment Finance Today", url: "https://www.housingfinance.com/rss.xml" },
+  // CRE & real estate broader
+  { name: "Bisnow Multifamily", url: "https://www.bisnow.com/rss/national/multifamily" },
+  { name: "Connect CRE National", url: "https://www.connect.media/feed/" },
+  { name: "CoStar News", url: "https://www.costar.com/rss/news" },
+  { name: "The Real Deal", url: "https://therealdeal.com/feed/" },
 ];
 
 export type NewsItem = {
