@@ -60,16 +60,16 @@ export default async function CompanyDetail({ params }: { params: Promise<{ id: 
           <div>
             <div className="flex items-center gap-3 mb-2">
               <h1 className="text-2xl font-bold text-white">{c.name as string}</h1>
-              {c.building_class && (
+              {c.building_class ? (
                 <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${classColors[c.building_class as string] ?? "bg-slate-800 text-slate-300 border-slate-700"}`}>
                   Class {c.building_class as string}
                 </span>
-              )}
-              {c.for_sale && (
+              ) : null}
+              {c.for_sale ? (
                 <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-rose-900/50 text-rose-300 border border-rose-700/50">
                   FOR SALE {c.sale_price ? `• ${formatPrice(c.sale_price as number)}` : ""}
                 </span>
-              )}
+              ) : null}
             </div>
             <p className="text-slate-400 text-sm">
               {[c.city, c.state].filter(Boolean).join(", ")}
@@ -120,11 +120,11 @@ export default async function CompanyDetail({ params }: { params: Promise<{ id: 
                         <p className="text-slate-500 text-xs">{ct.title as string}</p>
                       </div>
                       <div className="text-right">
-                        {ct.email && (
+                        {ct.email ? (
                           <a href={`mailto:${ct.email}`} className="text-indigo-400 hover:text-indigo-300 text-xs transition-colors">
                             {ct.email as string}
                           </a>
-                        )}
+                        ) : null}
                       </div>
                     </li>
                   );
