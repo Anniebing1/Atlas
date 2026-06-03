@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type Company = {
   id: string;
@@ -34,6 +35,7 @@ const classColors: Record<string, string> = {
 };
 
 export default function CompaniesSearch() {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [market, setMarket] = useState("");
   const [bClass, setBClass] = useState("");
@@ -150,7 +152,7 @@ export default function CompaniesSearch() {
             </thead>
             <tbody>
               {results.map((c) => (
-                <tr key={c.id} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
+                <tr key={c.id} onClick={() => router.push(`/dashboard/companies/${c.id}`)} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors cursor-pointer">
                   <td className="px-5 py-3 text-white font-medium max-w-[200px] truncate">{c.name}</td>
                   <td className="px-4 py-3 text-slate-400">{c.city ?? "—"}</td>
                   <td className="px-4 py-3">
